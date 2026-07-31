@@ -41,7 +41,7 @@ body {
 
 .brand img {
   display: block;
-  width: clamp(9.75rem, 18vw, 13.5rem);
+  width: clamp(10.75rem, 20vw, 15rem);
   height: auto;
   margin: 0 auto;
 }
@@ -83,7 +83,7 @@ body {
   }
 
   .brand img {
-    width: 10rem;
+    width: 11.2rem;
   }
 
   .descriptor {
