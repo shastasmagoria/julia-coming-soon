@@ -31,18 +31,19 @@ body {
 .announcement {
   width: min(100%, 46rem);
   text-align: center;
-  transform: translateY(1.2rem);
+  transform: translateY(0.35rem);
 }
 
 .brand {
   margin: 0;
-  padding-left: 0.5em;
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(1.05rem, 1.45vw, 1.25rem);
-  font-weight: 400;
-  letter-spacing: 0.5em;
-  line-height: 1;
-  text-transform: lowercase;
+  line-height: 0;
+}
+
+.brand img {
+  display: block;
+  width: clamp(9.75rem, 18vw, 13.5rem);
+  height: auto;
+  margin: 0 auto;
 }
 
 .descriptor,
@@ -57,7 +58,7 @@ body {
 }
 
 .descriptor {
-  margin-top: 1.25rem;
+  margin-top: 0.95rem;
   color: var(--secondary);
 }
 
@@ -81,7 +82,14 @@ body {
     transform: translateY(0);
   }
 
+  .brand img {
+    width: 10rem;
+  }
+
   .descriptor {
+    max-width: 20rem;
+    margin-right: auto;
+    margin-left: auto;
     letter-spacing: 0.22em;
   }
 }
