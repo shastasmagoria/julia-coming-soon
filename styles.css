@@ -46,7 +46,10 @@ body {
   display: block;
   width: clamp(12rem, 22vw, 17rem);
   height: auto;
+  aspect-ratio: 950 / 210;
   margin: 0 auto;
+  overflow: visible;   /* the living line enters from beyond the wordmark's own box */
+  color: var(--primary);
 }
 
 .byline {
@@ -90,9 +93,10 @@ body {
 }
 
 /* Living-line entrance (see living-line.js). Without JavaScript or with reduced motion, none of this applies. */
-.entrance .wordmark {
+/* The finished wordmark is hidden while the living line writes it; the animation draws inside the same
+   SVG and fades the finished wordmark in itself, so its last frame is the static page. */
+.entrance .wordmark .mark {
   opacity: 0;
-  transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .entrance .byline {
@@ -100,20 +104,10 @@ body {
   transition: opacity 1100ms cubic-bezier(0.4, 0, 0.4, 1);
 }
 
-.entrance.settled .wordmark,
-.entrance.entrance-done .wordmark,
+.entrance.entrance-done .wordmark .mark,
 .entrance.lockup .byline,
 .entrance.entrance-done .byline {
   opacity: 1;
-}
-
-.living-line {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
 }
 
 .living-line .line {

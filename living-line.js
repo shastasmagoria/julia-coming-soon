@@ -1,6 +1,8 @@
 // Living-line entrance for julia.build.
 // A single line enters from the left edge of the screen, writes "julia" in one stroke, and comes to rest exactly
-// on the wordmark. It then swells and hands over to the rendered wordmark (julia-signature.svg).
+// on the wordmark. It then swells and hands over to the rendered wordmark. Everything is drawn inside the page's own
+// wordmark SVG, so the line, the hand-off and the finished wordmark share one coordinate system in every browser
+// and the last frame of the animation is the static page.
 // "by Night Heron Labs" fades in beneath it as soon as the "a" has been written. Without JavaScript, or with reduced motion, the page is static.
 (function () {
   'use strict';
@@ -15,6 +17,7 @@
   var SETTLE = 0.7;          // seconds for the line to hand over to the rendered wordmark
   var W_DRAW = 2.3;          // line weight while writing (wordmark units)
   var W_SET = 3.0;           // weight it swells toward during the hand-over
+  var DOT_SET = 2.5;         // dot radius in the rendered wordmark
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
   var root = document.documentElement;
@@ -55,16 +58,16 @@
     if (root.classList.contains('entrance-done')) return;   // the fallback already revealed the page
 
     var wordmark = document.querySelector('.wordmark');
-    var svg = el('svg', { 'class': 'living-line', 'aria-hidden': 'true' });
-    var group = el('g', {}, svg);
+    var ink = wordmark.querySelector('.mark');                // the finished wordmark
+    var group = el('g', { 'class': 'living-line', 'aria-hidden': 'true' }, wordmark);
     var line = el('path', { 'class': 'line' }, group);
     var dots = WORD.info.dots.map(function (p) {
       return el('circle', { 'class': 'dot', cx: p[0], cy: p[1] }, group);
     });
-    var probeIn = el('path', {}, svg);
-    var probeWord = el('path', { d: WORD.d }, svg);
+    var probeIn = el('path', {}, group);
+    var probeWord = el('path', { d: WORD.d }, group);
     probeIn.style.visibility = probeWord.style.visibility = 'hidden';
-    document.body.appendChild(svg);
+    ink.style.opacity = 0;
 
     var geo;
     function layout() {
@@ -82,7 +85,6 @@
         fmt(sx - dx * 0.35 * span) + ' ' + fmt(sy - dy * 0.35 * span) + ' ' + sx + ' ' + sy;
       probeIn.setAttribute('d', leadIn);
       line.setAttribute('d', leadIn + WORD.d.replace(/^M[^Cc]+/, ''));
-      group.setAttribute('transform', 'translate(' + fmt(box.left) + ' ' + fmt(box.top) + ') scale(' + s.toFixed(5) + ')');
 
       var lin = probeIn.getTotalLength(), lw = probeWord.getTotalLength(), total = line.getTotalLength();
       var marks = [0];
@@ -118,13 +120,14 @@
       var w = W_DRAW + (W_SET - W_DRAW) * k;
       line.style.strokeWidth = w;
       line.style.opacity = 1 - k;
+      ink.style.opacity = k;
       line.style.visibility = head - tail > 0.01 ? 'visible' : 'hidden';
       line.style.strokeDasharray = (head - tail) + ' ' + geo.total * 2;
       line.style.strokeDashoffset = -tail;
       dots.forEach(function (dot, i) {
-        dot.setAttribute('r', fmt(W_DRAW * 0.85));
+        dot.setAttribute('r', fmt(W_DRAW * 0.85 + (DOT_SET - W_DRAW * 0.85) * k));
         dot.classList.toggle('on', head >= geo.dotAt[i]);
-        dot.style.opacity = head >= geo.dotAt[i] ? 1 - k : '';
+        dot.style.opacity = k > 0 ? 1 - k : '';   // the finished wordmark's own dots take over
       });
     }
 
@@ -135,13 +138,13 @@
       var t = (now - t0) / 1000, T = geo.duration;
       var head = geo.draw(t);
       if (head >= geo.aDone) root.classList.add('lockup');  // the byline fades in once the "a" is written
-      if (t >= T) root.classList.add('settled');           // the rendered wordmark fades in under the line
       var k = t <= T ? 0 : 1 - Math.pow(1 - Math.min(1, (t - T) / SETTLE), 3);
       render(head, k);
       if (t < T + SETTLE) {
         requestAnimationFrame(frame);
       } else {
-        svg.remove();
+        group.remove();
+        ink.style.opacity = '';
         root.classList.add('entrance-done');
         removeEventListener('resize', onResize);
       }
