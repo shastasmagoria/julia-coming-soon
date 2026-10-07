@@ -1,7 +1,7 @@
 // Living-line entrance for julia.build.
 // A single line enters from the left edge of the screen, writes "julia" in one stroke, and comes to rest exactly
-// on the wordmark. It then swells and hands over to the rendered wordmark (julia-signature.svg) while
-// "by Night Heron Labs" settles in beneath it. Without JavaScript, or with reduced motion, the page is static.
+// on the wordmark. It then swells and hands over to the rendered wordmark (julia-signature.svg).
+// "by Night Heron Labs" fades in beneath it as soon as the "a" has been written. Without JavaScript, or with reduced motion, the page is static.
 (function () {
   'use strict';
 
@@ -107,6 +107,7 @@
         lin: lin,
         total: total,
         draw: function (t) { return fromE(f(t)); },
+        aDone: lin + info.letEnd * lw,
         duration: f.duration,
         dotAt: [lin + info.jDot * lw, lin + info.iDot * lw]
       };
@@ -132,10 +133,11 @@
     var t0 = performance.now();
     function frame(now) {
       var t = (now - t0) / 1000, T = geo.duration;
-      if (t >= T - 0.25) root.classList.add('lockup');     // the byline settles in as the line comes to rest
+      var head = geo.draw(t);
+      if (head >= geo.aDone) root.classList.add('lockup');  // the byline fades in once the "a" is written
       if (t >= T) root.classList.add('settled');           // the rendered wordmark fades in under the line
       var k = t <= T ? 0 : 1 - Math.pow(1 - Math.min(1, (t - T) / SETTLE), 3);
-      render(geo.draw(t), k);
+      render(head, k);
       if (t < T + SETTLE) {
         requestAnimationFrame(frame);
       } else {
