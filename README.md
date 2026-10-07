@@ -6,6 +6,8 @@ This folder contains a complete static website for `julia.build`.
 
 - `index.html` contains the visible words and page structure.
 - `styles.css` controls the fonts, spacing, colors, and layout.
+- `julia-signature.svg` is the rendered Julia wordmark (the "living line" v7 letterforms with ink weight).
+- `living-line.js` plays the entrance: one line writes "julia", settles into the wordmark, and "by Night Heron Labs" fades in. Visitors who prefer reduced motion, or who have JavaScript off, see the finished page straight away.
 - `CNAME` tells GitHub Pages that the site uses `julia.build`.
 
 ## Recommended free hosting: GitHub Pages
